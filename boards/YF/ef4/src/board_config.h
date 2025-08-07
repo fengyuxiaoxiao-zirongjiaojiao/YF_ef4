@@ -76,8 +76,9 @@
 
 /* LEDs are driven with push pull Anodes to 3.3V */
 
-#define GPIO_nLED_RED        /* PD10 */  (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTD|GPIO_PIN10)
-#define GPIO_nLED_BLUE       /* PD11 */  (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTD|GPIO_PIN11)
+#define GPIO_nLED_RED        /* PG6 */  GPIO_RGB_RED
+#define GPIO_nLED_BLUE       /* PG5 */  GPIO_RGB_BLUE
+#define GPIO_nLED_GREEN      /* PG7 */  GPIO_RGB_GREEN
 
 #define BOARD_HAS_CONTROL_STATUS_LEDS      1
 #define BOARD_OVERLOAD_LED     LED_RED
@@ -102,60 +103,42 @@
 /* Define GPIO pins used as ADC N.B. Channel numbers must match below  */
 
 #define PX4_ADC_GPIO  \
-	/* PC4  */  GPIO_ADC12_INP4,   \
-	/* PB1  */  GPIO_ADC12_INP5,   \
-	/* PC5  */  GPIO_ADC12_INP8,   \
-	/* PC0  */  GPIO_ADC123_INP10, \
-	/* PC1  */  GPIO_ADC123_INP11, \
-	/* PA2  */  GPIO_ADC12_INP14,  \
-	/* PA4  */  GPIO_ADC12_INP18   \
+	/* PC0  */  GPIO_AD_RSSI,   \
+	/* PC1  */  GPIO_AD_T1,   \
+	/* PC2_C*/  GPIO_AD_VBN,   \
+	/* PC3_C*/  GPIO_AD_VBP, \
+	/* PF3  */  GPIO_AD_T3, \
+	/* PF4  */  GPIO_AD_T2,  \
+	/* PF5  */  GPIO_AD_IB,   \
+	/* PF6  */  GPIO_AD_V24, \
+	/* PF7  */  GPIO_AD_I24, \
+	/* PF8  */  GPIO_AD_I7,   \
+	/* PF9  */  GPIO_AD_V7P, \
+	/* PF10 */  GPIO_AD_V7N \
 
 /* Define Channel numbers must match above GPIO pin IN(n)*/
-#define ADC_BATTERY1_CURRENT_CHANNEL            /* PC4 */  ADC1_CH(4)
-#define ADC_BATTERY2_VOLTAGE_CHANNEL            /* PB1 */  ADC1_CH(5)
-#define ADC_BATTERY1_VOLTAGE_CHANNEL            /* PC5 */  ADC1_CH(8)
-#define ADC_HW_REV_SENSE_CHANNEL                /* PC0 */  ADC3_CH(10)
-#define ADC_HW_VER_SENSE_CHANNEL                /* PC1 */  ADC3_CH(11)
-#define ADC_BATTERY2_CURRENT_CHANNEL            /* PA2 */  ADC1_CH(14)
-#define ADC_SCALED_V5_CHANNEL                   /* PA4 */  ADC1_CH(18)
+#define ADC_BATTERY1_CURRENT_CHANNEL            /* PF7 */  ADC3_CH(3)
+#define ADC_BATTERY1_VOLTAGE_CHANNEL            /* PF6 */  ADC3_CH(8)
+#define ADC_BATTERY2_CURRENT_CHANNEL            /* PF5 */  ADC3_CH(4)
+#define ADC_BATTERY2_VOLTAGE_CHANNEL            /*PC3_C*/  ADC3_CH(1)
+
 
 #define ADC_CHANNELS \
 	((1 << ADC_BATTERY1_CURRENT_CHANNEL) | \
 	 (1 << ADC_BATTERY2_VOLTAGE_CHANNEL) | \
 	 (1 << ADC_BATTERY1_VOLTAGE_CHANNEL) | \
-	 (1 << ADC_BATTERY2_CURRENT_CHANNEL) | \
-	 (1 << ADC_SCALED_V5_CHANNEL       ))
+	 (1 << ADC_BATTERY2_CURRENT_CHANNEL))
 
 #define HW_REV_VER_ADC_BASE STM32_ADC3_BASE
 
 #define SYSTEM_ADC_BASE STM32_ADC1_BASE
 
-/* HW has to large of R termination on ADC todo:change when HW value is chosen */
-#define BOARD_ADC_OPEN_CIRCUIT_V     (5.6f)
-
-/* HW Version and Revision drive signals Default to 1 to detect */
-#define BOARD_HAS_HW_VERSIONING
-
-#define GPIO_HW_VER_REV_DRIVE  /* PE12 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTE|GPIO_PIN12)
-#define GPIO_HW_REV_SENSE      /* PC0 */  GPIO_ADC123_INP10
-#define GPIO_HW_VER_SENSE      /* PC1 */  GPIO_ADC123_INP11
-#define HW_INFO_INIT_PREFIX    "V6C"
-
-#define BOARD_NUM_SPI_CFG_HW_VERSIONS 5 // Rev 0, 10 and Mini Sensor sets
-//                 Base/FMUM
-#define V6C00   HW_VER_REV(0x0,0x0) // FMUV6C,                 Rev 0  I2C4 External but with Internal devices
-#define V6C01   HW_VER_REV(0x0,0x1) // FMUV6C,                 Rev 1  I2C4 Internal I2C2 External
-#define V6C02   HW_VER_REV(0x0,0x2) // FMUV6C,                 Rev 2  I2C4 Internal I2C2 External,BMI088+ICM-42688P
-#define V6C10   HW_VER_REV(0x1,0x0) // NO PX4IO,               Rev 0  I2C4 External but with Internal devices
-#define V6C11   HW_VER_REV(0x1,0x1) // NO PX4IO,               Rev 1  I2C4 Internal I2C2 External
-#define V6C21   HW_VER_REV(0x2,0x1) // FMUV6CMini,             Rev 1  I2C4 Internal I2C2 External
-#define V6C22   HW_VER_REV(0x2,0x2) // FMUV6CMini,             Rev 2  I2C4 Internal I2C2 External,BMI088+ICM-42688P
-
 /* HEATER
  * PWM in future
  */
-#define GPIO_HEATER_OUTPUT   /* PB9  T17CH1 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN9)
-#define HEATER_OUTPUT_EN(on_true)	       px4_arch_gpiowrite(GPIO_HEATER_OUTPUT, (on_true))
+//TODO:没有设计心跳引脚
+// #define GPIO_HEATER_OUTPUT   /* PB9  T17CH1 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN9)
+// #define HEATER_OUTPUT_EN(on_true)	       px4_arch_gpiowrite(GPIO_HEATER_OUTPUT, (on_true))
 
 /* PWM
  */
@@ -164,36 +147,30 @@
 
 /* Power supply control and monitoring GPIOs */
 
-#define GPIO_nPOWER_IN_A                /* PA15  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTA|GPIO_PIN15)
-#define GPIO_nPOWER_IN_B                /* PB12  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTB|GPIO_PIN12)
-#define GPIO_nPOWER_IN_C                /* PE15  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTE|GPIO_PIN15)
+// #define GPIO_nPOWER_IN_A                /* PA15  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTA|GPIO_PIN15)
+// #define GPIO_nPOWER_IN_B                /* PB12  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTB|GPIO_PIN12)
+// #define GPIO_nPOWER_IN_C                /* PE15  */ (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTE|GPIO_PIN15)
 
-#define GPIO_nVDD_BRICK1_VALID          GPIO_nPOWER_IN_A /* Brick 1 Is Chosen */
-#define GPIO_nVDD_BRICK2_VALID          GPIO_nPOWER_IN_B /* Brick 2 Is Chosen  */
-#define BOARD_NUMBER_BRICKS             2
-#define GPIO_nVDD_USB_VALID             GPIO_nPOWER_IN_C /* USB     Is Chosen */
+// #define GPIO_nVDD_BRICK1_VALID          GPIO_nPOWER_IN_A /* Brick 1 Is Chosen */
+// #define GPIO_nVDD_BRICK2_VALID          GPIO_nPOWER_IN_B /* Brick 2 Is Chosen  */
+// #define BOARD_NUMBER_BRICKS             2
+// #define GPIO_nVDD_USB_VALID             GPIO_nPOWER_IN_C /* USB     Is Chosen */
 
-#define GPIO_VDD_5V_PERIPH_nEN          /* PE2  */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTE|GPIO_PIN2)
-#define GPIO_VDD_5V_PERIPH_nOC          /* PE3  */ (GPIO_INPUT |GPIO_FLOAT|GPIO_PORTE|GPIO_PIN3)
-#define GPIO_VDD_5V_HIPOWER_nEN         /* PC10 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTC|GPIO_PIN10)
-#define GPIO_VDD_5V_HIPOWER_nOC         /* PC11 */ (GPIO_INPUT |GPIO_FLOAT|GPIO_PORTC|GPIO_PIN11)
-#define GPIO_VDD_3V3_SENSORS_EN         /* PB2  */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN2)
+// #define GPIO_VDD_5V_PERIPH_nEN          /* PE2  */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTE|GPIO_PIN2)
+// #define GPIO_VDD_5V_PERIPH_nOC          /* PE3  */ (GPIO_INPUT |GPIO_FLOAT|GPIO_PORTE|GPIO_PIN3)
+// #define GPIO_VDD_5V_HIPOWER_nEN         /* PC10 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTC|GPIO_PIN10)
+// #define GPIO_VDD_5V_HIPOWER_nOC         /* PC11 */ (GPIO_INPUT |GPIO_FLOAT|GPIO_PORTC|GPIO_PIN11)
+// #define GPIO_VDD_3V3_SENSORS_EN         /* PB2  */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN2)
 
 /* Define True logic Power Control in arch agnostic form */
 
-#define VDD_5V_PERIPH_EN(on_true)          px4_arch_gpiowrite(GPIO_VDD_5V_PERIPH_nEN, !(on_true))
-#define VDD_5V_HIPOWER_EN(on_true)         px4_arch_gpiowrite(GPIO_VDD_5V_HIPOWER_nEN, !(on_true))
-#define VDD_3V3_SENSORS_EN(on_true)       px4_arch_gpiowrite(GPIO_VDD_3V3_SENSORS4_EN, (on_true))
+// #define VDD_5V_PERIPH_EN(on_true)          px4_arch_gpiowrite(GPIO_VDD_5V_PERIPH_nEN, !(on_true))
+// #define VDD_5V_HIPOWER_EN(on_true)         px4_arch_gpiowrite(GPIO_VDD_5V_HIPOWER_nEN, !(on_true))
+// #define VDD_3V3_SENSORS_EN(on_true)       px4_arch_gpiowrite(GPIO_VDD_3V3_SENSORS4_EN, (on_true))
 
 /* Tone alarm output */
-
-#define TONE_ALARM_TIMER        3  /* Timer 3 */
-#define TONE_ALARM_CHANNEL      3  /* PB0 GPIO_TIM3_CH3OUT_1 */
-
-#define GPIO_BUZZER_1           /* PPB0 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN0)
-
-#define GPIO_TONE_ALARM_IDLE    GPIO_BUZZER_1
-#define GPIO_TONE_ALARM         GPIO_TIM3_CH3OUT_1
+#define GPIO_TONE_ALARM_IDLE    GPIO_BUZZER
+#define GPIO_TONE_ALARM         GPIO_BUZZER
 
 /* USB OTG FS
  *
@@ -201,17 +178,17 @@
  */
 #define GPIO_OTGFS_VBUS         /* PA9 */ (GPIO_INPUT|GPIO_PULLDOWN|GPIO_SPEED_100MHz|GPIO_PORTA|GPIO_PIN9)
 
-/* High-resolution timer */
-#define HRT_TIMER               8  /* use timer8 for the HRT */
-#define HRT_TIMER_CHANNEL       3  /* use capture/compare channel 3 */
+// /* High-resolution timer */
+// #define HRT_TIMER               8  /* use timer8 for the HRT */
+// #define HRT_TIMER_CHANNEL       3  /* use capture/compare channel 3 */
 
-/* PWM input driver. Use FMU AUX5 pins attached to timer4 channel 3 */
-#define PWMIN_TIMER                       4
-#define PWMIN_TIMER_CHANNEL    /* T4C3 */ 3
-#define GPIO_PWM_IN            /* PD14 */ GPIO_TIM4_CH3IN_2
+// /* PWM input driver. Use FMU AUX5 pins attached to timer4 channel 3 */
+// #define PWMIN_TIMER                       4
+// #define PWMIN_TIMER_CHANNEL    /* T4C3 */ 3
+// #define GPIO_PWM_IN            /* PD14 */ GPIO_TIM4_CH3IN_2
 
-#define SDIO_SLOTNO                    0  /* Only one slot */
-#define SDIO_MINOR                     0
+// #define SDIO_SLOTNO                    0  /* Only one slot */
+// #define SDIO_MINOR                     0
 
 /* SD card bringup does not work if performed on the IDLE thread because it
  * will cause waiting.  Use either:
@@ -230,17 +207,17 @@
  * provides the true logic GPIO BOARD_ADC_xxxx macros.
  */
 #define BOARD_ADC_USB_CONNECTED (px4_arch_gpioread(GPIO_OTGFS_VBUS))
-#define BOARD_ADC_USB_VALID     (!px4_arch_gpioread(GPIO_nVDD_USB_VALID))
+// #define BOARD_ADC_USB_VALID     (!px4_arch_gpioread(GPIO_nVDD_USB_VALID))
 
-/* FMUv6C never powers off the Servo rail */
+// /* FMUv6C never powers off the Servo rail */
 
-#define BOARD_ADC_SERVO_VALID     (1)
+// #define BOARD_ADC_SERVO_VALID     (1)
 
-#define BOARD_ADC_BRICK1_VALID  (!px4_arch_gpioread(GPIO_nVDD_BRICK1_VALID))
-#define BOARD_ADC_BRICK2_VALID  (!px4_arch_gpioread(GPIO_nVDD_BRICK2_VALID))
+// #define BOARD_ADC_BRICK1_VALID  (!px4_arch_gpioread(GPIO_nVDD_BRICK1_VALID))
+// #define BOARD_ADC_BRICK2_VALID  (!px4_arch_gpioread(GPIO_nVDD_BRICK2_VALID))
 
-#define BOARD_ADC_PERIPH_5V_OC  (!px4_arch_gpioread(GPIO_VDD_5V_PERIPH_nOC))
-#define BOARD_ADC_HIPOWER_5V_OC (!px4_arch_gpioread(GPIO_VDD_5V_HIPOWER_nOC))
+// #define BOARD_ADC_PERIPH_5V_OC  (!px4_arch_gpioread(GPIO_VDD_5V_PERIPH_nOC))
+// #define BOARD_ADC_HIPOWER_5V_OC (!px4_arch_gpioread(GPIO_VDD_5V_HIPOWER_nOC))
 
 
 /* This board provides a DMA pool and APIs */
@@ -252,20 +229,20 @@
 
 #define PX4_GPIO_INIT_LIST { \
 		PX4_ADC_GPIO,                     \
-		GPIO_HW_VER_REV_DRIVE,            \
+		GPIO_LED,		     	  \
+		GPIO_BUZZER,		     	  \
 		GPIO_CAN1_TX,                     \
 		GPIO_CAN1_RX,                     \
 		GPIO_CAN2_TX,                     \
 		GPIO_CAN2_RX,                     \
-		GPIO_HEATER_OUTPUT,               \
-		GPIO_nPOWER_IN_A,                 \
-		GPIO_nPOWER_IN_B,                 \
-		GPIO_nPOWER_IN_C,                 \
-		GPIO_VDD_5V_PERIPH_nEN,           \
-		GPIO_VDD_5V_PERIPH_nOC,           \
-		GPIO_VDD_5V_HIPOWER_nEN,          \
-		GPIO_VDD_5V_HIPOWER_nOC,          \
-		GPIO_VDD_3V3_SENSORS_EN,          \
+		GPIO_RGB_BLUE,	      		  \
+		GPIO_RGB_GREEN,		     	  \
+		GPIO_RGB_RED,		     	  \
+		GPIO_NAVLIGHT_RIGHT,              \
+		GPIO_NAVLIGHT_LEFT,               \
+		GPIO_IMU_POWER,                   \
+		GPIO_IMU_LED,                     \
+		GPIO_IMU_HEATER,                  \
 		GPIO_TONE_ALARM_IDLE,             \
 	}
 

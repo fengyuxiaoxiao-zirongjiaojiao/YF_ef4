@@ -278,20 +278,20 @@
 /* ADC Channels *************************************************************/
 
 /* Single-ended ADC inputs */
-#define GPIO_AD_RSSI     GPIO_ADC123_INP10_0       /* PC0  - ADC3_IN10 (RSSI信号强度) */
-#define GPIO_AD_T1       GPIO_ADC123_INP11_0       /* PC1  - ADC3_IN11 (电源板温度采样) */
-#define GPIO_AD_T3       GPIO_ADC3_INP5_0          /* PF3  - ADC3_IN5 (外置温度采样1) */
-#define GPIO_AD_T2       GPIO_ADC3_INP9_0          /* PF4  - ADC3_IN9 (外置温度采样2) */
-#define GPIO_AD_IB       GPIO_ADC3_INP4_0          /* PF5  - ADC3_IN4 (电池电流霍尔采样) */
-#define GPIO_AD_V24      GPIO_ADC3_INP8_0          /* PF6  - ADC3_IN8 (系统电压采样) */
-#define GPIO_AD_I24      GPIO_ADC3_INP3_0          /* PF7  - ADC3_IN3 (系统电流采样) */
-#define GPIO_AD_I7       GPIO_ADC3_INP7_0          /* PF8  - ADC3_IN7 (舵机电流采样) */
-#define GPIO_AD_V7P      GPIO_ADC3_INP2_0          /* PF9  - ADC3_IN2 (舵机电压正采样) */
-#define GPIO_AD_V7N      GPIO_ADC3_INN2_0          /* PF10 - ADC3_IN2 (舵机电压负采样) */
+#define GPIO_AD_RSSI     GPIO_ADC123_INP10       /* PC0  - ADC3_IN10 (RSSI信号强度) */
+#define GPIO_AD_T1       GPIO_ADC123_INP11       /* PC1  - ADC3_IN11 (电源板温度采样) */
+#define GPIO_AD_T3       GPIO_ADC3_INP5          /* PF3  - ADC3_IN5 (外置温度采样1) */
+#define GPIO_AD_T2       GPIO_ADC3_INP9          /* PF4  - ADC3_IN9 (外置温度采样2) */
+#define GPIO_AD_IB       GPIO_ADC3_INP4          /* PF5  - ADC3_IN4 (电池电流霍尔采样) */
+#define GPIO_AD_V24      GPIO_ADC3_INP8          /* PF6  - ADC3_IN8 (系统电压采样) */
+#define GPIO_AD_I24      GPIO_ADC3_INP3          /* PF7  - ADC3_IN3 (系统电流采样) */
+#define GPIO_AD_I7       GPIO_ADC3_INP7          /* PF8  - ADC3_IN7 (舵机电流采样) */
+#define GPIO_AD_V7P      GPIO_ADC3_INP2          /* PF9  - ADC3_IN2 (舵机电压正采样) */
+#define GPIO_AD_V7N      GPIO_ADC3_INN2          /* PF10 - ADC3_IN2 (舵机电压负采样) */
 
 /* Differential ADC inputs */
-#define GPIO_AD_VBN      GPIO_ADC3_INN1_0          /* PC2_C - ADC3_IN1N (电池电压负采样) */
-#define GPIO_AD_VBP      GPIO_ADC3_INP1_0          /* PC3_C - ADC3_IN1P (电池电压正采样) */
+#define GPIO_AD_VBN      (GPIO_ANALOG|GPIO_PORTC|GPIO_PIN2)          /* PC2_C - ADC3_IN1N (电池电压负采样) */
+#define GPIO_AD_VBP      (GPIO_ANALOG|GPIO_PORTC|GPIO_PIN3)         /* PC3_C - ADC3_IN1P (电池电压正采样) */
 
 /* 电源板状态指示灯 */
 #define GPIO_LED        (GPIO_OUTPUT | GPIO_PULLUP | GPIO_OUTPUT_SET | GPIO_SPEED_2MHz | \
@@ -327,16 +327,16 @@
 #define GPIO_BUZZER       GPIO_TIM13_CH1OUT_1    /* PA6 - TIM13_CH1 */
 
 /* SD引脚配置 (原理图第6页) */
-#define GPIO_SDIO_CK    GPIO_SDMMC1_CK_0     /* PC12 - SDIO_CK */
-#define GPIO_SDIO_CMD   GPIO_SDMMC1_CMD_0    /* PD2 - SDIO_CMD */
-#define GPIO_SDIO_D0    GPIO_SDMMC1_D0_0     /* PC8 - SDIO_D0 */
-#define GPIO_SDIO_D1    GPIO_SDMMC1_D1_0     /* PC9 - SDIO_D1 */
-#define GPIO_SDIO_D2    GPIO_SDMMC1_D2_0     /* PC10 - SDIO_D2 */
-#define GPIO_SDIO_D3    GPIO_SDMMC1_D3_0     /* PC11 - SDIO_D3 */
+#define GPIO_SDIO_CK    GPIO_SDMMC1_CK     /* PC12 - SDIO_CK */
+#define GPIO_SDIO_CMD   GPIO_SDMMC1_CMD    /* PD2 - SDIO_CMD */
+#define GPIO_SDIO_D0    GPIO_SDMMC1_D0     /* PC8 - SDIO_D0 */
+#define GPIO_SDIO_D1    GPIO_SDMMC1_D1     /* PC9 - SDIO_D1 */
+#define GPIO_SDIO_D2    GPIO_SDMMC1_D2     /* PC10 - SDIO_D2 */
+#define GPIO_SDIO_D3    GPIO_SDMMC1_D3     /* PC11 - SDIO_D3 */
 
 /* USB引脚配置 */
-#define GPIO_USB_DM     GPIO_OTGFS_DM_0    /* PA11 - USB_DM (Full-Speed) */
-#define GPIO_USB_DP     GPIO_OTGFS_DP_0    /* PA12 - USB_DP (Full-Speed) */
+#define GPIO_USB_DM     GPIO_OTGFS_DM    /* PA11 - USB_DM (Full-Speed) */
+#define GPIO_USB_DP     GPIO_OTGFS_DP    /* PA12 - USB_DP (Full-Speed) */
 
 /* CAN1 配置 */
 #define GPIO_CAN1_RX    GPIO_CAN1_RX_3    /* PD0 - CAN1_RX */
@@ -462,8 +462,8 @@
 #define GPIO_INPUT_EXT2   GPIO_TIM5_CH4IN_1  // PA3/TIM5_CH4
 
 /* Debug引脚配置宏 */
-#define GPIO_SWDIO       GPIO_SWDIO_0        /* PA13 */
-#define GPIO_SWCLK       GPIO_SWCLK_0        /* PA14 */
+// #define GPIO_SWDIO       GPIO_SWDIO        /* PA13 */
+// #define GPIO_SWCLK       GPIO_SWCLK        /* PA14 */
 
 /* IMU电源控制 */
 #define GPIO_IMU_POWER   (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTE|GPIO_PIN15)
