@@ -62,9 +62,8 @@
  */
 
 #define STM32_BOARD_XTAL        16000000ul	/* 16 MHz crystal */
-#define STM32_RTC_XTAL          32768ul
+#define STM32_RTC_XTAL          32768    	/* 32.768 kHz crystal for RTC */
 
-#define STM32_LSE_FREQUENCY     32768    	/* 32.768 kHz crystal for RTC */
 #define STM32_LSI_FREQUENCY     32000    	/* 32 kHz internal RC */
 #define STM32_HSI_FREQUENCY     64000000ul 	/* 64 MHz internal RC */
 #define STM32_CSI_FREQUENCY     4000000ul  	/* 4 MHz internal RC */
@@ -204,6 +203,12 @@
 #define STM32_USART7_CLKSRC     STM32_PCLK1_FREQUENCY  /* 120 MHz */
 #define STM32_USART8_CLKSRC     STM32_PCLK1_FREQUENCY  /* 120 MHz */
 #define STM32_LPUART1_CLKSRC    STM32_PCLK3_FREQUENCY  /* 120 MHz */
+
+/* Kernel Clock Configuration
+ *
+ * Note: look at Table 54 in ST Manual
+ */
+
 
 /* I2C123 clock source */
 
@@ -525,33 +530,4 @@
 # define PROBE_MARK(n)
 #endif
 
-/* Kernel Clock Configuration
- *
- * Note: look at Table 54 in ST Manual
- */
-
-/* I2C123 clock source */
-
-#define STM32_RCC_D2CCIP2R_I2C123SRC RCC_D2CCIP2R_I2C123SEL_HSI
-
-/* I2C4 clock source */
-
-#define STM32_RCC_D3CCIPR_I2C4SRC    RCC_D3CCIPR_I2C4SEL_HSI
-
-/* SPI123 clock source */
-
-#define STM32_RCC_D2CCIP1R_SPI123SRC RCC_D2CCIP1R_SPI123SEL_PLL2
-
-/* SPI45 clock source */
-
-#define STM32_RCC_D2CCIP1R_SPI45SRC  RCC_D2CCIP1R_SPI45SEL_PLL2
-
-/* SPI6 clock source */
-
-#define STM32_RCC_D3CCIPR_SPI6SRC    RCC_D3CCIPR_SPI6SEL_PLL2
-
-/* USB 1 and 2 clock source */
-
-#define STM32_RCC_D2CCIP2R_USBSRC    RCC_D2CCIP2R_USBSEL_HSI48
-
-#endif  /*__NUTTX_CONFIG_PX4_FMU_V6C_INCLUDE_BOARD_H  */
+#endif  /*__BOARDS_ARM_YF_EF4_INCLUDE_BOARD_H  */

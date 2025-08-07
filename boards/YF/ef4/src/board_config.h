@@ -34,7 +34,7 @@
 /**
  * @file board_config.h
  *
- * PX4FMU-v6c internal definitions
+ * PX4YF-ef4 internal definitions
  */
 
 #pragma once
