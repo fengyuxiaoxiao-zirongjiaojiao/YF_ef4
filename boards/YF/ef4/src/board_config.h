@@ -55,6 +55,8 @@
  ****************************************************************************************************/
 
 #undef TRACE_PINS
+// 在文件开头附近添加
+#define BOARD_HAS_NO_HW_VERSION_DETECTION
 
 /* PX4IO connection configuration */
 
@@ -117,17 +119,17 @@
 	/* PF10 */  GPIO_AD_V7N \
 
 /* Define Channel numbers must match above GPIO pin IN(n)*/
-#define ADC_BATTERY1_CURRENT_CHANNEL            /* PF7 */  ADC3_CH(3)
-#define ADC_BATTERY1_VOLTAGE_CHANNEL            /* PF6 */  ADC3_CH(8)
-#define ADC_BATTERY2_CURRENT_CHANNEL            /* PF5 */  ADC3_CH(4)
-#define ADC_BATTERY2_VOLTAGE_CHANNEL            /*PC3_C*/  ADC3_CH(1)
+#define ADC_BATTERY_CURRENT_CHANNEL            	/* PF7 */  ADC3_CH(3)
+#define ADC_BATTERY_VOLTAGE_CHANNEL            	/* PF6 */  ADC3_CH(8)
+#define ADC_BATTERY1_CURRENT_CHANNEL            /* PF5 */  ADC3_CH(4)
+#define ADC_BATTERY1_VOLTAGE_CHANNEL            /*PC3_C*/  ADC3_CH(1)
 
 
 #define ADC_CHANNELS \
-	((1 << ADC_BATTERY1_CURRENT_CHANNEL) | \
-	 (1 << ADC_BATTERY2_VOLTAGE_CHANNEL) | \
+	((1 << ADC_BATTERY_CURRENT_CHANNEL) | \
 	 (1 << ADC_BATTERY1_VOLTAGE_CHANNEL) | \
-	 (1 << ADC_BATTERY2_CURRENT_CHANNEL))
+	 (1 << ADC_BATTERY_VOLTAGE_CHANNEL) | \
+	 (1 << ADC_BATTERY1_CURRENT_CHANNEL))
 
 #define HW_REV_VER_ADC_BASE STM32_ADC3_BASE
 
@@ -137,8 +139,8 @@
  * PWM in future
  */
 //TODO:没有设计心跳引脚
-// #define GPIO_HEATER_OUTPUT   /* PB9  T17CH1 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN9)
-// #define HEATER_OUTPUT_EN(on_true)	       px4_arch_gpiowrite(GPIO_HEATER_OUTPUT, (on_true))
+#define GPIO_HEATER_OUTPUT   /* PB9  T17CH1 */ (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN9)
+#define HEATER_OUTPUT_EN(on_true)	       px4_arch_gpiowrite(GPIO_HEATER_OUTPUT, (on_true))
 
 /* PWM
  */
@@ -169,8 +171,11 @@
 // #define VDD_3V3_SENSORS_EN(on_true)       px4_arch_gpiowrite(GPIO_VDD_3V3_SENSORS4_EN, (on_true))
 
 /* Tone alarm output */
-#define GPIO_TONE_ALARM_IDLE    GPIO_BUZZER
-#define GPIO_TONE_ALARM         GPIO_BUZZER
+#define TONE_ALARM_TIMER        13  /* Timer 13 */
+#define TONE_ALARM_CHANNEL      1   /* PA6 GPIO_TIM13_CH1OUT_1 */
+#define RCC_APB1ENR_TIM13EN	RCC_APB1LENR_TIM13EN
+#define GPIO_TONE_ALARM_IDLE    GPIO_BUZZER_1
+#define GPIO_TONE_ALARM         GPIO_BUZZER_1
 
 /* USB OTG FS
  *
@@ -178,17 +183,17 @@
  */
 #define GPIO_OTGFS_VBUS         /* PA9 */ (GPIO_INPUT|GPIO_PULLDOWN|GPIO_SPEED_100MHz|GPIO_PORTA|GPIO_PIN9)
 
-// /* High-resolution timer */
-// #define HRT_TIMER               8  /* use timer8 for the HRT */
-// #define HRT_TIMER_CHANNEL       3  /* use capture/compare channel 3 */
+/* High-resolution timer */
+#define HRT_TIMER               8  /* use timer8 for the HRT */
+#define HRT_TIMER_CHANNEL       1  /* use capture/compare channel 1 */
 
 // /* PWM input driver. Use FMU AUX5 pins attached to timer4 channel 3 */
 // #define PWMIN_TIMER                       4
 // #define PWMIN_TIMER_CHANNEL    /* T4C3 */ 3
 // #define GPIO_PWM_IN            /* PD14 */ GPIO_TIM4_CH3IN_2
 
-// #define SDIO_SLOTNO                    0  /* Only one slot */
-// #define SDIO_MINOR                     0
+#define SDIO_SLOTNO                    0  /* Only one slot */
+#define SDIO_MINOR                     0
 
 /* SD card bringup does not work if performed on the IDLE thread because it
  * will cause waiting.  Use either:
@@ -227,10 +232,16 @@
 
 #define BOARD_HAS_ON_RESET 1
 
+/* HW Version and Revision drive signals Default to 1 to detect */
+// #define BOARD_HAS_HW_VERSIONING
+
+// #define HW_INFO_INIT_PREFIX "YFEF4"
+// #define HW_INFO_INIT_PREFIX_LEN 5
+
 #define PX4_GPIO_INIT_LIST { \
 		PX4_ADC_GPIO,                     \
 		GPIO_LED,		     	  \
-		GPIO_BUZZER,		     	  \
+		GPIO_BUZZER_1,		     	  \
 		GPIO_CAN1_TX,                     \
 		GPIO_CAN1_RX,                     \
 		GPIO_CAN2_TX,                     \
@@ -260,17 +271,6 @@ __BEGIN_DECLS
 /****************************************************************************************************
  * Public Types
  ****************************************************************************************************/
-
-/****************************************************************************************************
- * Public data
- ****************************************************************************************************/
-
-#ifndef __ASSEMBLY__
-
-/****************************************************************************************************
- * Public Functions
- ****************************************************************************************************/
-
 /****************************************************************************
  * Name: stm32_sdio_initialize
  *
@@ -280,6 +280,11 @@ __BEGIN_DECLS
  ****************************************************************************/
 
 int stm32_sdio_initialize(void);
+/****************************************************************************************************
+ * Public data
+ ****************************************************************************************************/
+
+#ifndef __ASSEMBLY__
 
 /****************************************************************************************************
  * Name: stm32_spiinitialize

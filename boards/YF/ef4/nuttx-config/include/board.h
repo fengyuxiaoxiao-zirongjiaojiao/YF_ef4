@@ -220,15 +220,15 @@
 
 /* SPI123 clock source */
 
-#define STM32_RCC_D2CCIP1R_SPI123SRC STM32_PLL2P_FREQUENCY  /* 32 MHz */
+#define STM32_RCC_D2CCIP1R_SPI123SRC 	RCC_D2CCIP1R_SPI123SEL_PLL2  /* 32 MHz */
 
 /* SPI45 clock source */
 
-#define STM32_RCC_D2CCIP1R_SPI45SRC  STM32_PCLK2_FREQUENCY  /* 240 MHz */
+#define STM32_RCC_D2CCIP1R_SPI45SRC  RCC_D2CCIP1R_SPI45SEL_PLL2
 
 /* SPI6 clock source */
 
-#define STM32_RCC_D3CCIPR_SPI6SRC    STM32_PLL2Q_FREQUENCY  /* 32 MHz */
+#define STM32_RCC_D3CCIPR_SPI6SRC    RCC_D3CCIPR_SPI6SEL_PLL2
 
 /* USB 1 and 2 clock source */
 
@@ -247,6 +247,36 @@
 
 /* HRTIM */
 #define STM32_HRTIM_CLKSRC      STM32_APB1_TIM2_CLKIN  /* 240 MHz */
+
+/* SDMMC definitions ********************************************************/
+
+/* 初始化时钟分频设置，400kHz，频率计算公式为：freq = PLL2R/(2*div)  因此 div = PLL2R/(2*freq)
+ * div = 128MHz / (2 * 400kHz) = 128000000 / 800000 = 160
+ */
+#define STM32_SDMMC_INIT_CLKDIV     (160 << STM32_SDMMC_CLKCR_CLKDIV_SHIFT)
+
+/* MMC传输时钟分频设置
+ * 最大25MHz，使用公式 25MHz = PLL2R/(2*div)，可得 div = PLL2R/(2*freq)
+ * div = 128MHz / (2 * 25MHz) = 128000000 / 50000000 = 2.56，向上取整为3
+ */
+#if defined(CONFIG_STM32H7_SDMMC_XDMA) || defined(CONFIG_STM32H7_SDMMC_IDMA)
+#  define STM32_SDMMC_MMCXFR_CLKDIV   (3 << STM32_SDMMC_CLKCR_CLKDIV_SHIFT)
+#else
+#  define STM32_SDMMC_MMCXFR_CLKDIV   (100 << STM32_SDMMC_CLKCR_CLKDIV_SHIFT)
+#endif
+
+/* SD卡传输时钟分频设置
+ * 根据是否启用DMA来设置不同的时钟分频值
+ * 25MHz: div = 128MHz / (2 * 25MHz) = 2.56，向上取整为3
+ */
+#if defined(CONFIG_STM32H7_SDMMC_XDMA) || defined(CONFIG_STM32H7_SDMMC_IDMA)
+#  define STM32_SDMMC_SDXFR_CLKDIV    (3 << STM32_SDMMC_CLKCR_CLKDIV_SHIFT)
+#else
+#  define STM32_SDMMC_SDXFR_CLKDIV    (100 << STM32_SDMMC_CLKCR_CLKDIV_SHIFT)
+#endif
+
+/* SDMMC时钟边沿配置，使用下降沿进行数据采样 */
+#define STM32_SDMMC_CLKCR_EDGE      STM32_SDMMC_CLKCR_NEGEDGE
 
 
 /* FLASH wait states
@@ -324,7 +354,7 @@
 #define GPIO_PWM16      GPIO_TIM1_CH1OUT_2       /* PE9  - TIM1_CH1 */
 
 /* 蜂鸣器PWM (TIM13) */
-#define GPIO_BUZZER       GPIO_TIM13_CH1OUT_1    /* PA6 - TIM13_CH1 */
+#define GPIO_BUZZER_1       GPIO_TIM13_CH1OUT_1    /* PA6 - TIM13_CH1 */
 
 /* SD引脚配置 (原理图第6页) */
 #define GPIO_SDIO_CK    GPIO_SDMMC1_CK     /* PC12 - SDIO_CK */
@@ -354,9 +384,13 @@
 #define GPIO_USART2_TX    GPIO_USART2_TX_2    /* PD5 - USART2发送引脚 */
 #define GPIO_USART2_RX    GPIO_USART2_RX_2    /* PD6 - USART2接收引脚 */
 
+/* USART3 引脚定义 */
+#define GPIO_USART3_TX    GPIO_USART3_TX_3    /* PD8 - USART3发送引脚 */
+#define GPIO_USART3_RX    GPIO_USART3_RX_3    /* PD9 - USART3接收引脚 */
+
 /* UART5 引脚定义 */
-// #define GPIO_UART5_TX     GPIO_UART5_TX_2     /* PB6 - UART5发送引脚 */
-// #define GPIO_UART5_RX     GPIO_UART5_RX_2     /* PB5 - UART5接收引脚 */
+#define GPIO_UART5_TX     GPIO_UART5_TX_2     /* PB6 - UART5发送引脚 */
+#define GPIO_UART5_RX     GPIO_UART5_RX_2     /* PB5 - UART5接收引脚 */
 
 /* UART7 引脚定义 (RTK串口) */
 #define GPIO_UART7_RX     GPIO_UART7_RX_3     /* PE7 - UART7接收引脚 */
@@ -381,6 +415,11 @@
 /* RTK UART 引脚定义 (UART7) */
 #define GPIO_RTK_RX      GPIO_UART7_RX_3     /* PE7 - RTK发送引脚 (UART7_RX) */
 #define GPIO_RTK_TX      GPIO_UART7_TX_3     /* PE8 - RTK接收引脚 (UART7_TX) */
+#define GPIO_UART7_RTS
+#define GPIO_UART7_CTS
+
+#define GPIO_UART8_RX
+#define GPIO_UART8_TX
 
 /* RTK状态引脚 */
 #define GPIO_RTK_PPS        (GPIO_INPUT | GPIO_PULLUP | GPIO_EXTI | GPIO_PORTG | GPIO_PIN4) /* 秒脉冲输入 */
@@ -432,10 +471,31 @@
 #define GPIO_SPI1_MOSI   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTD | GPIO_PIN7)
 
 /* 设备片选引脚 */
-#define GPIO_FRAM_CS     (GPIO_OUTPUT | GPIO_FLOAT | GPIO_SPEED_2MHz | \
+#define GPIO_FRAM_CS     (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | \
                          GPIO_OUTPUT_SET | GPIO_PORTA | GPIO_PIN8)  /* FM25V20A片选 */
-#define GPIO_IMU_CS      (GPIO_OUTPUT | GPIO_FLOAT | GPIO_SPEED_2MHz | \
+#define GPIO_IMU_CS      (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | \
                          GPIO_OUTPUT_SET | GPIO_PORTG | GPIO_PIN8)  /* ICM-20602片选 */
+
+/* SPI2引脚定义 */
+#define GPIO_SPI2_CS     (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | \
+			 GPIO_OUTPUT_SET | GPIO_PORTE | GPIO_PIN12)  /* SPI2片选引脚 */
+#define GPIO_SPI2_SCK    (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTD | GPIO_PIN3)
+#define GPIO_SPI2_MISO   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTB | GPIO_PIN14)
+#define GPIO_SPI2_MOSI   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTB | GPIO_PIN15)
+
+/* SPI4引脚定义 */
+#define GPIO_SPI4_CS     (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | \
+			 GPIO_OUTPUT_SET | GPIO_PORTG | GPIO_PIN1)
+#define GPIO_SPI4_SCK    (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTE | GPIO_PIN2)
+#define GPIO_SPI4_MISO   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTE | GPIO_PIN5)
+#define GPIO_SPI4_MOSI   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTE | GPIO_PIN6)
+
+/* SPI6引脚定义 */
+#define GPIO_SPI6_CS     (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | \
+			 GPIO_OUTPUT_SET | GPIO_PORTG | GPIO_PIN0)  /* SPI6片选引脚 */
+#define GPIO_SPI6_SCK    (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTG | GPIO_PIN13)
+#define GPIO_SPI6_MISO   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTG | GPIO_PIN12)
+#define GPIO_SPI6_MOSI   (GPIO_ALT | GPIO_AF5 | GPIO_SPEED_2MHz | GPIO_PORTG | GPIO_PIN14)
 
 /****************************************************************************
  * I2C1 Configuration
@@ -447,6 +507,56 @@
 
 /* 中断引脚 */
 #define GPIO_I2C1_EXIT   (GPIO_INPUT | GPIO_PUSHPULL | GPIO_PORTE | GPIO_PIN10)  /* 空速计中断引脚 */
+
+/* LED definitions ******************************************************************/
+/* The px4_fmu-v6c board has three, LED_GREEN a Green LED, LED_BLUE a Blue LED and
+ * LED_RED a Red LED, that can be controlled by software.
+ *
+ * If CONFIG_ARCH_LEDS is not defined, then the user can control the LEDs in any way.
+ * The following definitions are used to access individual LEDs.
+ */
+
+/* LED index values for use with board_userled() */
+
+#define BOARD_LED1        0
+#define BOARD_LED2        1
+#define BOARD_LED3        2
+#define BOARD_NLEDS       3
+
+#define BOARD_LED_RED     BOARD_LED1
+#define BOARD_LED_GREEN   BOARD_LED2
+#define BOARD_LED_BLUE    BOARD_LED3
+
+/* LED bits for use with board_userled_all() */
+
+#define BOARD_LED1_BIT    (1 << BOARD_LED1)
+#define BOARD_LED2_BIT    (1 << BOARD_LED2)
+#define BOARD_LED3_BIT    (1 << BOARD_LED3)
+
+/* If CONFIG_ARCH_LEDS is defined, the usage by the board port is defined in
+ * include/board.h and src/stm32_leds.c. The LEDs are used to encode OS-related
+ * events as follows:
+ *
+ *
+ *   SYMBOL                     Meaning                      LED state
+ *                                                        Red   Green Blue
+ *   ----------------------  --------------------------  ------ ------ ----*/
+
+#define LED_STARTED        0 /* NuttX has been started   OFF    OFF   OFF  */
+#define LED_HEAPALLOCATE   1 /* Heap has been allocated  OFF    OFF   ON   */
+#define LED_IRQSENABLED    2 /* Interrupts enabled       OFF    ON    OFF  */
+#define LED_STACKCREATED   3 /* Idle stack created       OFF    ON    ON   */
+#define LED_INIRQ          4 /* In an interrupt          N/C    N/C   GLOW */
+#define LED_SIGNAL         5 /* In a signal handler      N/C    GLOW  N/C  */
+#define LED_ASSERTION      6 /* An assertion failed      GLOW   N/C   GLOW */
+#define LED_PANIC          7 /* The system has crashed   Blink  OFF   N/C  */
+#define LED_IDLE           8 /* MCU is is sleep mode     ON     OFF   OFF  */
+
+/* Thus if the Green LED is statically on, NuttX has successfully booted and
+ * is, apparently, running normally.  If the Red LED is flashing at
+ * approximately 2Hz, then a fatal error has been detected and the system
+ * has halted.
+ */
 
 /* RGB灯 */
 #define GPIO_RGB_BLUE   (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTG|GPIO_PIN5)

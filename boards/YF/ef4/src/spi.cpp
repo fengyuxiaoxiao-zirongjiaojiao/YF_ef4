@@ -35,57 +35,24 @@
 #include <drivers/drv_sensor.h>
 #include <nuttx/spi/spi.h>
 
-constexpr px4_spi_bus_all_hw_t px4_spi_buses_all_hw[BOARD_NUM_SPI_CFG_HW_VERSIONS] = {
-	initSPIHWVersion(V6C00, {
-		initSPIBus(SPI::Bus::SPI1, {
-			initSPIDevice(DRV_GYR_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin14}, SPI::DRDY{GPIO::PortE, GPIO::Pin5}),
-			initSPIDevice(DRV_ACC_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin15}, SPI::DRDY{GPIO::PortE, GPIO::Pin4}),
-			initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortC, GPIO::Pin13}, SPI::DRDY{GPIO::PortE, GPIO::Pin6}),
-		}, {GPIO::PortB, GPIO::Pin2}),
-		initSPIBus(SPI::Bus::SPI2, {
-			initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortD, GPIO::Pin4})
-		}),
+constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
+	// SPI1: ICM-20602 and FM25V20A
+	initSPIBus(SPI::Bus::SPI1, {
+		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{GPIO::PortG, GPIO::Pin8}),  // ICM-20602 CS
+		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortA, GPIO::Pin8}),           // FM25V20A CS
 	}),
-	initSPIHWVersion(V6C01, {
-		initSPIBus(SPI::Bus::SPI1, {
-			initSPIDevice(DRV_GYR_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin14}, SPI::DRDY{GPIO::PortE, GPIO::Pin5}),
-			initSPIDevice(DRV_ACC_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin15}, SPI::DRDY{GPIO::PortE, GPIO::Pin4}),
-			initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortC, GPIO::Pin13}, SPI::DRDY{GPIO::PortE, GPIO::Pin6}),
-		}, {GPIO::PortB, GPIO::Pin2}),
-		initSPIBus(SPI::Bus::SPI2, {
-			initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortD, GPIO::Pin4})
-		}),
+	// SPI2: RM3100
+	initSPIBus(SPI::Bus::SPI2, {
+		initSPIDevice(DRV_MAG_DEVTYPE_RM3100, SPI::CS{GPIO::PortE, GPIO::Pin12}),   // RM3100 CS
 	}),
-	initSPIHWVersion(V6C02, {
-		initSPIBus(SPI::Bus::SPI1, {
-			initSPIDevice(DRV_GYR_DEVTYPE_BMI088,  SPI::CS{GPIO::PortC, GPIO::Pin14}, SPI::DRDY{GPIO::PortE, GPIO::Pin5}),
-			initSPIDevice(DRV_ACC_DEVTYPE_BMI088,  SPI::CS{GPIO::PortC, GPIO::Pin15}, SPI::DRDY{GPIO::PortE, GPIO::Pin4}),
-			initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortC, GPIO::Pin13}, SPI::DRDY{GPIO::PortE, GPIO::Pin6}),
-		}, {GPIO::PortB, GPIO::Pin2}),
-		initSPIBus(SPI::Bus::SPI2, {
-			initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortD, GPIO::Pin4})
-		}),
+	// SPI4: ICM-42688P-1
+	initSPIBus(SPI::Bus::SPI4, {
+		initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortG, GPIO::Pin1}, SPI::DRDY{GPIO::PortF, GPIO::Pin14}), // ICM-42688P-1 CS + DRDY
 	}),
-	initSPIHWVersion(V6C21, {
-		initSPIBus(SPI::Bus::SPI1, {
-			initSPIDevice(DRV_GYR_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin14}, SPI::DRDY{GPIO::PortE, GPIO::Pin5}),
-			initSPIDevice(DRV_ACC_DEVTYPE_BMI055,  SPI::CS{GPIO::PortC, GPIO::Pin15}, SPI::DRDY{GPIO::PortE, GPIO::Pin4}),
-			initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortC, GPIO::Pin13}, SPI::DRDY{GPIO::PortE, GPIO::Pin6}),
-		}, {GPIO::PortB, GPIO::Pin2}),
-		initSPIBus(SPI::Bus::SPI2, {
-			initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortD, GPIO::Pin4})
-		}),
-	}),
-	initSPIHWVersion(V6C22, {
-		initSPIBus(SPI::Bus::SPI1, {
-			initSPIDevice(DRV_GYR_DEVTYPE_BMI088,  SPI::CS{GPIO::PortC, GPIO::Pin14}, SPI::DRDY{GPIO::PortE, GPIO::Pin5}),
-			initSPIDevice(DRV_ACC_DEVTYPE_BMI088,  SPI::CS{GPIO::PortC, GPIO::Pin15}, SPI::DRDY{GPIO::PortE, GPIO::Pin4}),
-			initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortC, GPIO::Pin13}, SPI::DRDY{GPIO::PortE, GPIO::Pin6}),
-		}, {GPIO::PortB, GPIO::Pin2}),
-		initSPIBus(SPI::Bus::SPI2, {
-			initSPIDevice(SPIDEV_FLASH(0), SPI::CS{GPIO::PortD, GPIO::Pin4})
-		}),
+	// SPI6: ICM-42688P-2
+	initSPIBus(SPI::Bus::SPI6, {
+		initSPIDevice(DRV_IMU_DEVTYPE_ICM42688P, SPI::CS{GPIO::PortG, GPIO::Pin0}), // ICM-42688P-2 CS
 	}),
 };
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses_all_hw);
+static constexpr bool unused = validateSPIConfig(px4_spi_buses);

@@ -78,7 +78,25 @@
 /****************************************************************************
  * Pre-Processor Definitions
  ****************************************************************************/
-
+/****************************************************************************
+ * Name: board_determine_hw_info
+ *
+ * Description:
+ *   Determines the hardware revision and version
+ *
+ * Input Parameters:
+ *   None
+ *
+ * Returned Value:
+ *   0 on success, negative error value on failure
+ *
+ ****************************************************************************/
+int board_determine_hw_info(void)
+{
+    // 由于 BOARD_HAS_NO_HW_VERSION_DETECTION 已定义，
+    // 我们不需要实际检测硬件版本，直接返回成功
+    return 0;
+}
 /* Configuration ************************************************************/
 
 /*
